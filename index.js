@@ -1,25 +1,22 @@
-const app = require('http').createServer(handler)
-const io = require('socket.io')(app);
-const fs = require('fs');
+var app = require('express')();
+var http = require('http').createServer(app);
+var io = require('socket.io')(http);
 
-app.listen(80);
-
-function handler (req, res) {
-  fs.readFile(__dirname + '/client.html',
-  (err, data) => {
-    if (err) {
-      res.writeHead(500);
-      return res.end('Error loading index.html');
-    }
-
-    res.writeHead(200);
-    res.end(data);
-  });
-}
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
 
 io.on('connection', (socket) => {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', (data) => {
-    console.log(data);
+  console.log('a user connected');
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
   });
+
+  socket.on('chat message', (msg) => {
+    console.log('message: ' + msg.v);
+  });
+});
+
+http.listen(3000, () => {
+  console.log('listening on *:3000');
 });

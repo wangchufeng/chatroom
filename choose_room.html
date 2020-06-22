@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        button {
+            font-size: 50px;
+            margin-top: 40px;
+        }
+
+        .room-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="room-container">
+        <button id='room-one'>room 1</button>
+        <button id='room-two'>room 2</button>
+        <button id='room-three'>room 3</button>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io()
+        var container = document.getElementsByClassName('room-container')[0]
+
+        container.addEventListener('click', function (e) {
+            var room = e.target.id;
+            var roomID = room.slice(5, )
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/room?id=' + encodeURIComponent(roomID), true);
+            xhr.send(null)
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        console.log(xhr.getResponseHeader("Location"));
+                        window.location.href = xhr.getResponseHeader("Location");
+                        document.write(xhr.responseText);
+                    }
+                }
+            }
+
+        })
+    </script>
+</body>
+
+</html>

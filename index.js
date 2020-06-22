@@ -2,21 +2,35 @@ var app = require('express')();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+app.get('/chatroom', (req, res) => {
+	res.sendFile(__dirname + '/choose_room.html');
 });
 
-io.on('connection', (socket) => {
-  console.log('a user connected');
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
-
-  socket.on('chat message', (msg) => {
-    console.log('message: ' + msg.v);
-  });
+app.get('/room', (req, res) => {
+	res.setHeader('Location', 'http://www.room.com');  	
+	res.sendFile(__dirname + '/index.html');
+	// res.end();
 });
 
-http.listen(3000, () => {
-  console.log('listening on *:3000');
+
+const chat = io.of('chat')
+
+chat.on('connect', (socket) => {
+	socket.emit('welcome', {
+		msg: 'welcome'
+	})
+	
+	console.log('chat connect')
+	socket.on('chat message', (req) => {
+		console.log(req)
+		socket.broadcast.emit('a message', {
+			msg: req.v
+		});
+	})
+})
+
+
+
+http.listen(80, () => {
+	console.log('listening on *:80');
 });
